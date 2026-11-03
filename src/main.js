@@ -10,6 +10,8 @@ import * as settings from './ui/settings.js'
 import * as diary from './ui/diary.js'
 import * as prayer from './ui/prayer.js'
 import * as answered from './ui/answered.js'
+import * as searchView from './ui/searchView.js'
+import * as summaryView from './ui/summaryView.js'
 
 const screens = {
   home: home.render,
@@ -18,6 +20,8 @@ const screens = {
   diary: diary.render,
   prayer: prayer.render,
   answered: answered.render,
+  search: searchView.render,
+  summary: summaryView.render,
 }
 
 const root = document.getElementById('app')
