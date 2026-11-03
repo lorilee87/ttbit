@@ -4,6 +4,7 @@ import { formatLongDate, formatShortDate, formatMonth, monthOf } from '../lib/da
 import { starredItems, onThisDay } from '../lib/highlights.js'
 import { needsBackupReminder } from '../lib/backup.js'
 import { itemHref } from './shell.js'
+import { iosHint } from './iosHint.js'
 
 const typeLabel = (type) => t(`type.${type}`)
 
@@ -21,6 +22,7 @@ export function render(params, ctx) {
   const showBackup = needsBackupReminder(snap, new Date())
 
   return h('div', {},
+    iosHint(ctx),
     h('div', { class: 'verse' },
       verse.text,
       verse.ref ? h('span', { class: 'ref' }, verse.ref) : null,

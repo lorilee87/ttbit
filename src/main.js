@@ -56,6 +56,11 @@ async function start() {
   window.addEventListener('pagehide', () => { diary.flush() })
   document.addEventListener('visibilitychange', () => { if (document.hidden) diary.flush() })
   await refresh()
+  // Pede ao navegador para não apagar os dados sozinho.
+  navigator.storage?.persist?.().catch(() => {})
+  if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {})
+  }
 }
 
 start()
