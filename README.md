@@ -18,4 +18,4 @@ npm test        # testes
 npm run build   # empacotar
 ```
 
-Cada push na branch `main` testa e publica no GitHub Pages.
+Para publicar uma versão nova: `npm run deploy` (testa, empacota e envia para a branch `gh-pages`).
