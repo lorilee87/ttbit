@@ -7,11 +7,13 @@ import { renderApp } from './ui/shell.js'
 import * as home from './ui/home.js'
 import * as starred from './ui/starred.js'
 import * as settings from './ui/settings.js'
+import * as diary from './ui/diary.js'
 
 const screens = {
   home: home.render,
   starred: starred.render,
   settings: settings.render,
+  diary: diary.render,
 }
 
 const root = document.getElementById('app')
@@ -21,6 +23,7 @@ const actions = {
   backup: () => {},
   restore: () => {},
   reminder: () => {},
+  share: () => {},
 }
 
 async function refresh() {
@@ -34,7 +37,9 @@ async function refresh() {
 async function start() {
   store.setDefaultLang(detectLang(navigator.language))
   await store.openStore()
-  window.addEventListener('hashchange', () => { refresh(); window.scrollTo(0, 0) })
+  window.addEventListener('hashchange', async () => { await diary.flush(); await refresh(); window.scrollTo(0, 0) })
+  window.addEventListener('pagehide', () => { diary.flush() })
+  document.addEventListener('visibilitychange', () => { if (document.hidden) diary.flush() })
   await refresh()
 }
 
