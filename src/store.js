@@ -132,7 +132,7 @@ export async function deleteList(id) {
 }
 
 export async function addPrayer(listId, text, date) {
-  const prayer = { id: newId(), listId, text, date, starred: false, answeredDate: null, answerNote: '', updatedAt: now() }
+  const prayer = { id: newId(), listId, text, date, starred: false, answeredDate: null, answerNote: '', createdAt: now(), updatedAt: now() }
   await tx(['prayers'], 'readwrite', (t) => put(t, 'prayers', prayer))
   return prayer
 }

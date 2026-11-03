@@ -8,12 +8,16 @@ import * as home from './ui/home.js'
 import * as starred from './ui/starred.js'
 import * as settings from './ui/settings.js'
 import * as diary from './ui/diary.js'
+import * as prayer from './ui/prayer.js'
+import * as answered from './ui/answered.js'
 
 const screens = {
   home: home.render,
   starred: starred.render,
   settings: settings.render,
   diary: diary.render,
+  prayer: prayer.render,
+  answered: answered.render,
 }
 
 const root = document.getElementById('app')
@@ -24,6 +28,7 @@ const actions = {
   restore: () => {},
   reminder: () => {},
   share: () => {},
+  shareAnswered: () => {},
 }
 
 async function refresh() {

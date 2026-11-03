@@ -95,3 +95,10 @@ test('replaceAll troca tudo pelo conteúdo dado', async () => {
   await store.replaceAll(data)
   expect(await store.getSnapshot()).toEqual(data)
 })
+
+test('addPrayer grava a hora de criação, para manter a ordem', async () => {
+  const l = await store.addList('personal', 'X')
+  const p = await store.addPrayer(l.id, 'a', '2026-11-03')
+  expect(typeof p.createdAt).toBe('string')
+  expect(p.createdAt.length).toBeGreaterThan(10)
+})
