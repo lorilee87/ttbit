@@ -12,7 +12,9 @@ test('arquivo de calendário com repetição diária e hora local', () => {
   expect(ics).toContain('TRIGGER:PT0M\r\n')
   expect(ics).toContain('SUMMARY:🙏 TTBIT: escreva um agradecimento\r\n')
   expect(ics).toContain(url)
-  expect(ics).not.toMatch(/T\d{6}Z\r\n/)
+  expect(ics).not.toMatch(/DTSTART:\S*Z/)
+  expect(ics).not.toMatch(/DTEND:\S*Z/)
+  expect(ics).toMatch(/DTSTAMP:\d{8}T\d{6}Z\r\n/)
   expect(ics.startsWith('BEGIN:VCALENDAR\r\n')).toBe(true)
 })
 

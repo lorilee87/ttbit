@@ -12,6 +12,10 @@ import * as prayer from './ui/prayer.js'
 import * as answered from './ui/answered.js'
 import * as searchView from './ui/searchView.js'
 import * as summaryView from './ui/summaryView.js'
+import { openShare } from './ui/share.js'
+import { makeBackup, restoreBackup } from './ui/backupUI.js'
+import { openReminder } from './ui/reminderUI.js'
+import { shareAnswered } from './lib/shareText.js'
 
 const screens = {
   home: home.render,
@@ -26,20 +30,22 @@ const screens = {
 
 const root = document.getElementById('app')
 
-// Ações que mais de uma tela usa. As etapas seguintes ligam cada uma.
+let ctx = null
+
+// Ações que mais de uma tela usa.
 const actions = {
-  backup: () => {},
-  restore: () => {},
-  reminder: () => {},
-  share: () => {},
-  shareAnswered: () => {},
+  backup: () => makeBackup(ctx),
+  restore: () => restoreBackup(ctx),
+  reminder: () => openReminder(ctx),
+  share: (text) => openShare(text),
+  shareAnswered: (prayer) => openShare(shareAnswered(prayer, ctx.lang)),
 }
 
 async function refresh() {
   const snap = await store.getSnapshot()
   setLang(snap.settings.lang)
   document.documentElement.lang = snap.settings.lang === 'en' ? 'en' : 'pt-BR'
-  const ctx = { snap, store, refresh, navigate, actions, lang: snap.settings.lang, today: localISODate(new Date()) }
+  ctx = { snap, store, refresh, navigate, actions, lang: snap.settings.lang, today: localISODate(new Date()) }
   renderApp(root, parseRoute(location.hash), ctx, screens)
 }
 

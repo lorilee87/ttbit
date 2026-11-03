@@ -23,7 +23,7 @@ export function reminderICS(time, lang, appUrl, now) {
     'PRODID:-//TTBIT//PT',
     'BEGIN:VEVENT',
     'UID:ttbit-reminder@ttbit',
-    `DTSTAMP:${stamp(now)}`,
+    `DTSTAMP:${now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')}`,
     `DTSTART:${start}`,
     `DTEND:${end}`,
     'RRULE:FREQ=DAILY',
