@@ -1,7 +1,7 @@
 import { h, toast, confirmDialog } from './dom.js'
 import { t } from '../i18n.js'
 import { formatShortDate, localISODate } from '../lib/dates.js'
-import { buildBackup, backupFileName, parseBackup, countSnapshot } from '../lib/backup.js'
+import { buildBackup, backupFileName, parseBackup, countSnapshot, newerISO } from '../lib/backup.js'
 import { deliverFile } from './share.js'
 
 export async function makeBackup(ctx) {
@@ -60,7 +60,7 @@ export async function restoreBackup(ctx) {
 
   // A data da última cópia continua sendo a deste aparelho, já que acabamos de mexer nele.
   const keepLast = (await ctx.store.getSnapshot()).settings.lastBackupAt
-  await ctx.store.replaceAll({ ...backup.data, settings: { ...backup.data.settings, lastBackupAt: keepLast || backup.createdAt } })
+  await ctx.store.replaceAll({ ...backup.data, settings: { ...backup.data.settings, lastBackupAt: newerISO(keepLast, backup.createdAt) } })
   toast(t('backup.restored'))
   ctx.navigate('#/')
 }

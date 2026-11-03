@@ -35,9 +35,18 @@ export function render(params, ctx) {
       h('a', { href: `#/diary/${date}/devotional`, class: tab === 'devotional' ? 'on' : null, role: 'tab' }, t('diary.tab.devotional'))),
     tab === 'ttb' ? ttbView(date, ttb, ctx) : devotionalView(date, devotional, ctx),
     (ttb.length || devotional?.text.trim())
-      ? h('div', { class: 'btns' }, h('button', { class: 'btn alt', onclick: () => ctx.actions.share(shareDay(date, ttb, devotional, lang)) }, t('diary.shareDay')))
+      ? h('div', { class: 'btns' }, h('button', { class: 'btn alt', onclick: () => shareToday(date, ctx) }, t('diary.shareDay')))
       : null,
   )
+}
+
+// Grava o que acabou de ser digitado e compartilha a versão mais nova do dia.
+async function shareToday(date, ctx) {
+  await flush()
+  const snap = await ctx.store.getSnapshot()
+  const ttb = snap.ttb.filter((x) => x.date === date)
+  const devotional = snap.devotionals.find((x) => x.date === date) || null
+  ctx.actions.share(shareDay(date, ttb, devotional, ctx.lang))
 }
 
 function ttbView(date, items, ctx) {

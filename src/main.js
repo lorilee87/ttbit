@@ -54,7 +54,11 @@ async function start() {
   await store.openStore()
   window.addEventListener('hashchange', async () => { await diary.flush(); await refresh(); window.scrollTo(0, 0) })
   window.addEventListener('pagehide', () => { diary.flush() })
-  document.addEventListener('visibilitychange', () => { if (document.hidden) diary.flush() })
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) diary.flush()
+    // O app pode ficar dias aberto no fundo: ao voltar, "hoje" precisa ser o dia de agora.
+    else if (ctx && localISODate(new Date()) !== ctx.today) diary.flush().then(refresh)
+  })
   await refresh()
   // Pede ao navegador para não apagar os dados sozinho.
   navigator.storage?.persist?.().catch(() => {})

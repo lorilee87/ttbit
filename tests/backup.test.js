@@ -61,3 +61,34 @@ test('item sem texto ou sem data é recusado', () => {
   c.data.lists = [{ id: 'l1', group: 'world' }]
   expect(parseBackup(JSON.stringify(c)).ok).toBe(false)
 })
+
+import { newerISO } from '../src/lib/backup.js'
+
+test('cópia com createdAt inválido ou faltando é recusada', () => {
+  const a = buildBackup(snap, now); a.createdAt = 'ontem'
+  expect(parseBackup(JSON.stringify(a))).toEqual({ ok: false, error: 'invalid' })
+  const b = buildBackup(snap, now); delete b.createdAt
+  expect(parseBackup(JSON.stringify(b))).toEqual({ ok: false, error: 'invalid' })
+})
+
+test('cópia com data de anotação inválida é recusada', () => {
+  const a = buildBackup(snap, now); a.data.ttb = [{ ...snap.ttb[0], date: 'x' }]
+  expect(parseBackup(JSON.stringify(a)).ok).toBe(false)
+  const b = buildBackup(snap, now); b.data.prayers = [{ ...snap.prayers[0], answeredDate: '20/10/2026' }]
+  expect(parseBackup(JSON.stringify(b)).ok).toBe(false)
+  const c = buildBackup(snap, now); c.data.lists = [{ ...snap.lists[0], group: 'marte' }]
+  expect(parseBackup(JSON.stringify(c)).ok).toBe(false)
+  const d = buildBackup(snap, now); d.data.devotionals = [{ ...snap.devotionals[0], id: 'outro' }]
+  expect(parseBackup(JSON.stringify(d)).ok).toBe(false)
+})
+
+test('pedido respondido com data válida continua aceito', () => {
+  const a = buildBackup(snap, now); a.data.prayers = [{ ...snap.prayers[0], answeredDate: '2026-10-20', answerNote: 'ok' }]
+  expect(parseBackup(JSON.stringify(a)).ok).toBe(true)
+})
+
+test('newerISO escolhe a data mais recente', () => {
+  expect(newerISO('2026-01-01T00:00:00.000Z', '2026-11-01T00:00:00.000Z')).toBe('2026-11-01T00:00:00.000Z')
+  expect(newerISO('2026-11-01T00:00:00.000Z', '2026-01-01T00:00:00.000Z')).toBe('2026-11-01T00:00:00.000Z')
+  expect(newerISO(null, '2026-01-01T00:00:00.000Z')).toBe('2026-01-01T00:00:00.000Z')
+})

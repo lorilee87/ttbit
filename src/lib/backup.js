@@ -1,4 +1,5 @@
-import { localISODate, addDays } from './dates.js'
+import { localISODate, addDays, parseISODate } from './dates.js'
+import { GROUPS } from '../router.js'
 
 export const BACKUP_VERSION = 1
 const ARRAYS = ['ttb', 'devotionals', 'lists', 'prayers']
@@ -33,11 +34,30 @@ export function parseBackup(text) {
   if (b.version > BACKUP_VERSION) return { ok: false, error: 'newerVersion' }
   const d = b.data
   if (!isObj(d) || !isObj(d.settings)) return { ok: false, error: 'invalid' }
+  if (typeof b.createdAt !== 'string' || Number.isNaN(Date.parse(b.createdAt))) return { ok: false, error: 'invalid' }
   for (const name of ARRAYS) {
     if (!Array.isArray(d[name])) return { ok: false, error: 'invalid' }
-    if (!d[name].every((x) => isObj(x) && REQUIRED[name].every((k) => typeof x[k] === 'string'))) return { ok: false, error: 'invalid' }
+    if (!d[name].every((x) => isObj(x) && REQUIRED[name].every((k) => typeof x[k] === 'string') && CHECK[name](x))) return { ok: false, error: 'invalid' }
   }
   return { ok: true, backup: b, counts: countSnapshot(d) }
+}
+
+// Data de anotação real no formato YYYY-MM-DD (recusa 2026-02-31).
+export function isRealDate(s) {
+  return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && localISODate(parseISODate(s)) === s
+}
+
+const CHECK = {
+  ttb: (x) => isRealDate(x.date),
+  devotionals: (x) => isRealDate(x.date) && x.id === x.date,
+  lists: (x) => GROUPS.includes(x.group),
+  prayers: (x) => isRealDate(x.date) && (x.answeredDate === null || x.answeredDate === undefined || isRealDate(x.answeredDate)),
+}
+
+export function newerISO(a, b) {
+  if (!a) return b
+  if (!b) return a
+  return Date.parse(a) >= Date.parse(b) ? a : b
 }
 
 export function needsBackupReminder(snap, now) {
